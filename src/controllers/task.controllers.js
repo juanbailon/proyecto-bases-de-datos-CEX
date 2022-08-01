@@ -1,6 +1,6 @@
 const pool = require('../db');
 
-const getAllTask = async (req, res) => {
+const getAllTask = async (req, res, next) => {
     try {
         const allTask = await pool.query('SELECT * FROM users');
     
@@ -8,15 +8,15 @@ const getAllTask = async (req, res) => {
         // res.send('tareas');
         res.json(allTask.rows);
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const hello = (req, res) => {
+const hello = (req, res, next) => {
     res.send('hello world');
 };
 
-const getTask = async (req, res) => {
+const getTask = async (req, res, next) => {
     try {
         //console.log(req.params.id);
         const {id} = req.params;
@@ -30,11 +30,11 @@ const getTask = async (req, res) => {
         res.json(result.rows[0]);
 
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-const createTask = async (req, res) => {
+const createTask = async (req, res, next) => {
     // const task = req.body;
     const {email, password } = req.body;
 
@@ -46,40 +46,49 @@ const createTask = async (req, res) => {
         res.json(result.rows[0]);
 
     } catch (error) {
-        console.log(error.message);
-        res.json( {error: error.message} );
+        next(error);
     }
 
 };
 
-const deleteTask =  async (req, res) => {
+const deleteTask =  async (req, res, next) => {
     
-    const {id} = req.params;
+    try {
+        const {id} = req.params;
     
-    const result = await pool.query('DELETE FROM users WHERE user_id = $1', [id]);
-    
-    if (result.rowCount ==0 ) {
-        return res.status(404).json( {message: "user not found"} );
-    }
+        const result = await pool.query('DELETE FROM users WHERE user_id = $1', [id]);
+        
+        if (result.rowCount ==0 ) {
+            return res.status(404).json( {message: "user not found"} );
+        }
 
-    return res.sendStatus(204);
+        return res.sendStatus(204);
+
+    } catch (error) {
+        next(error);        
+    }
 }; 
 
 
-const updateTask = async (req, res) => {
+const updateTask = async (req, res, next) => {
 
-    const {id} = req.params;
-    const {email, password} = req.body;
+    try {
+        const {id} = req.params;
+        const {email, password} = req.body;
 
-    const result = await pool.query(
-        'UPDATE users SET password= $1 WHERE user_id= $2 RETURNING *',
-        [password, id])
+        const result = await pool.query(
+            'UPDATE users SET password= $1 WHERE user_id= $2 RETURNING *',
+            [password, id])
 
-    if (result.rows.length == 0) {
-        return res.status(404).json( {message: "user not found"} );
+        if (result.rows.length == 0) {
+            return res.status(404).json( {message: "user not found"} );
+        }
+
+        return res.json(result.rows[0]);
+        
+    } catch (error) {
+        next(error);    
     }
-
-    return res.json(result.rows[0]);
 };
 
 
