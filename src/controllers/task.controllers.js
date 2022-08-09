@@ -111,11 +111,6 @@ const trade_limit = async (req, res, next) => {
             
             let order_id = result3.rows[0].order_id;
             
-            // const q6 = `UPDATE user_coins SET available = $1, in_orders = $2 WHERE user_id = $3 AND ticker_symbol= $4`;
-            //     let new_available = result0.rows[0].available - input_amount;
-            //     let new_in_orders = result0.rows[0].in_orders + parseFloat(input_amount);
-            //     console.log(result0.rows[0].available , "[[[[[[[[[[[[[[[[[[[ ", parseFloat( input_amount), " " ,parseFloat( result0.rows[0].available) - parseFloat(input_amount) )
-            //     const result6 = await pool.query( q6, [ new_available, new_in_orders, userId, input_coin] );
             determine_order_side(order_id, input_coin, output_coin, order_book_id);
             modify_user_balance_to_create_order( userId, input_coin, input_amount, result0.rows[0].available, result0.rows[0].in_orders);
 
@@ -126,12 +121,6 @@ const trade_limit = async (req, res, next) => {
 
                 const q5 = `UPDATE orders SET execution_price = $1, status = $2 WHERE order_id = $3`;
                 const result5 = await pool.query( q5, [ price, 'open',order_id] ); 
-
-                // const q6 = `UPDATE user_coins SET available = $1, in_orders = $2 WHERE user_id = $3 AND ticker_symbol= $4`;
-                // let new_available = result0.rows[0].available - input_amount;
-                // let new_in_orders = result0.rows[0].in_orders + parseFloat(input_amount);
-                // console.log(result0.rows[0].available , "[[[[[[[[[[[[[[[[[[[ ", parseFloat( input_amount), " " ,parseFloat( result0.rows[0].available) - parseFloat(input_amount) )
-                // const result6 = await pool.query( q6, [ new_available, new_in_orders, userId, input_coin] ); 
                 
                 add_limit_order_to_books(order_id, order_book_id);
 
