@@ -1,5 +1,5 @@
 const pool = require('../db');
-const {  create_basic_coin_exchange, create_basic_order, make_basic_order_limit, add_limit_order_to_books } = require('../components/orders');
+const {  create_basic_coin_exchange, create_basic_order, make_basic_order_limit, add_limit_order_to_books, determine_order_side, modify_user_balance_to_create_order } = require('../components/orders');
 const { macth_limit_order, execute_market_order } = require('../components/match_engine');
 
 
@@ -98,7 +98,7 @@ const trade_limit = async (req, res, next) => {
 
             let transaction_id = result.rows[0].transaction_id;
 
-            const q2 = `SELECT order_book_id FROM exchange_pair_books WHERE exchange_pair = $1`;
+            const q2 = `SELECT order_book_id FROM order_book WHERE exchange_pair = $1`;
             const result2 = await pool.query( q2, [exchange_pair]);
             
             let order_book_id = result2.rows[0].order_book_id;
@@ -110,6 +110,14 @@ const trade_limit = async (req, res, next) => {
 
             
             let order_id = result3.rows[0].order_id;
+            
+            // const q6 = `UPDATE user_coins SET available = $1, in_orders = $2 WHERE user_id = $3 AND ticker_symbol= $4`;
+            //     let new_available = result0.rows[0].available - input_amount;
+            //     let new_in_orders = result0.rows[0].in_orders + parseFloat(input_amount);
+            //     console.log(result0.rows[0].available , "[[[[[[[[[[[[[[[[[[[ ", parseFloat( input_amount), " " ,parseFloat( result0.rows[0].available) - parseFloat(input_amount) )
+            //     const result6 = await pool.query( q6, [ new_available, new_in_orders, userId, input_coin] );
+            determine_order_side(order_id, input_coin, output_coin, order_book_id);
+            modify_user_balance_to_create_order( userId, input_coin, input_amount, result0.rows[0].available, result0.rows[0].in_orders);
 
             if(order_type == "limit"){
 
@@ -119,22 +127,22 @@ const trade_limit = async (req, res, next) => {
                 const q5 = `UPDATE orders SET execution_price = $1, status = $2 WHERE order_id = $3`;
                 const result5 = await pool.query( q5, [ price, 'open',order_id] ); 
 
-                const q6 = `UPDATE user_coins SET available = $1, in_orders = $2 WHERE user_id = $3 AND ticker_symbol= $4`;
-                let new_available = result0.rows[0].available - input_amount;
-                let new_in_orders = result0.rows[0].in_orders + parseFloat(input_amount);
-                console.log(result0.rows[0].available , "[[[[[[[[[[[[[[[[[[[ ", parseFloat( input_amount), " " ,parseFloat( result0.rows[0].available) - parseFloat(input_amount) )
-                const result6 = await pool.query( q6, [ new_available, new_in_orders, userId, input_coin] ); 
-
-                add_limit_order_to_books(order_id);
+                // const q6 = `UPDATE user_coins SET available = $1, in_orders = $2 WHERE user_id = $3 AND ticker_symbol= $4`;
+                // let new_available = result0.rows[0].available - input_amount;
+                // let new_in_orders = result0.rows[0].in_orders + parseFloat(input_amount);
+                // console.log(result0.rows[0].available , "[[[[[[[[[[[[[[[[[[[ ", parseFloat( input_amount), " " ,parseFloat( result0.rows[0].available) - parseFloat(input_amount) )
+                // const result6 = await pool.query( q6, [ new_available, new_in_orders, userId, input_coin] ); 
+                
+                add_limit_order_to_books(order_id, order_book_id);
 
                 res.json({message: `limit order created sucesfully`});
             }
             else if (order_type == "market") {
 
-                execute_market_order( order_id, input_coin, output_coin, input_amount, order_book_id );
+                //execute_market_order( order_id, input_coin, output_coin, input_amount, order_book_id );
                 res.json({message: "market order created sucesfully"});
 
-                ex
+                
             }     
 
 
