@@ -120,7 +120,15 @@ const trade_limit = async (req, res, next) => {
                 const q6 = `SELECT side FROM orders WHERE order_id = $1`;
                 const result6 = await pool.query( q6, [ order_id ] );
 
-                let output_amount = ( result6.rows[0].side=='sell' )? input_amount*price : input_amount/price;
+                //let output_amount = ( result6.rows[0].side=='sell' )? input_amount*price : input_amount/price;
+                
+                let output_amount=0;
+
+                if ( result6.rows[0].side=='sell' ) {
+                    output_amount= input_amount*price;
+                }else if( result6.rows[0].side=='buy' ){
+                    output_amount= input_amount/price
+                }
                 output_amount = output_amount.toFixed(8);
 
                 const q4 = `UPDATE coin_exchange SET output_amount = $1 WHERE transaction_id = $2`;
@@ -134,6 +142,9 @@ const trade_limit = async (req, res, next) => {
                 res.json({message: `limit order created sucesfully`});
             }
             else if (order_type == "market") {
+
+                const q5 = `UPDATE orders SET status = $1 WHERE order_id = $2`;
+                const result5 = await pool.query( q5, [ 'open',order_id] );
 
                 execute_market_order( userId, order_id, transaction_id, input_coin, output_coin, input_amount, order_book_id );
                 res.json({message: "market order created sucesfully"});

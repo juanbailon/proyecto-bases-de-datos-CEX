@@ -87,8 +87,8 @@ async function modify_user_funds(user_id, ticker_symbol, amount, operation='add'
     if ( result1.rowCount == 0 ) {
         console.log("jors  2");
 
-        const q2 = `INSERT INTO user_coins (user_id, ticker_symbol) VALUES ($1, $2)`;
-        const result2 = await pool.query( q2, [ user_id, ticker_symbol ] );
+        const q2 = `INSERT INTO user_coins (user_id, ticker_symbol, total, available, in_orders, in_liq_pools) VALUES ($1, $2, $3, $4, $6, $6)`;
+        const result2 = await pool.query( q2, [ user_id, ticker_symbol, 0, 0, 0, 0 ] );
 
         result1 = await pool.query( q1, [ user_id, ticker_symbol ] );
 
@@ -106,7 +106,7 @@ async function modify_user_funds(user_id, ticker_symbol, amount, operation='add'
 
         new_available = ( modify_available==true )? result1.rows[0].available + amount : result1.rows[0].available ;
 
-        inew_in_orders = ( modify_in_orders==true )? result1.rows[0].in_orders + amount : result1.rows[0].in_orders ;
+        new_in_orders = ( modify_in_orders==true )? result1.rows[0].in_orders + amount : result1.rows[0].in_orders ;
 
         new_in_liq_pools = ( modify_in_liq_pools==true )? result1.rows[0].in_liq_pools + amount : result1.rows[0].in_liq_pools ;
 

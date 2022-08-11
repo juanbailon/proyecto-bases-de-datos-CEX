@@ -58,9 +58,10 @@ async function execute_market_order(user_id, order_id, transaction_id, input_coi
         let counter =0;
         
         while( sum < input_amount ){
+            console.log(result2.rows[counter].output_amount);
             sum += result2.rows[counter].output_amount;
             counter++;
-            //console.log(sum)
+            console.log(sum, " &&&&&&&&&&&&&&&&&&&")
         }
 
         console.log(sum)
@@ -69,47 +70,14 @@ async function execute_market_order(user_id, order_id, transaction_id, input_coi
 
         if( sum==input_amount && counter==1 ){
 
-            console.log("calicho 3")
+            macht_orders(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, useful_orders_in_bid_book);
 
-            let order_id_1 = order_id;
+        }
+        else if( sum==input_amount ){
 
-            const exec_price = useful_orders_in_bid_book[0].execution_price;
-            const order_id_2 = useful_orders_in_bid_book[0].order_id
-
-            create_trade(order_id, exec_price, order_id_2);
-
-            
-            const q1 = `UPDATE orders SET close_date = NOW(), status = 'close' WHERE order_id = $1`;
-            const result1 = await pool.query( q1, [ order_id_1 ] );
-            const result1_2 = await pool.query( q1, [ order_id_2 ] );
-
-            let transac_id_1 = transaction_id;
-            let transac_id_2 = useful_orders_in_bid_book[0].transaction_id;
-
-            //*********** */
-    
-            let user_id_1 = user_id;
-            let user_id_2 = useful_orders_in_bid_book[0].user_id;
-            
-            const q4 = `UPDATE coin_exchange SET output_amount = $1 WHERE transaction_id = $2`;
-            const result4 = await pool.query( q4, [ useful_orders_in_bid_book[0].input_amount, transac_id_1 ] ); 
-
-            
-
-            modify_user_funds(user_id_1, input_coin, input_amount, 'sub', false, true);
-            modify_user_funds(user_id_1, output_coin, useful_orders_in_bid_book[0].input_amount, 'add', true);
-
-            modify_user_funds(user_id_2, useful_orders_in_bid_book[0].input_coin, useful_orders_in_bid_book[0].input_amount, 'sub', false, true);
-            modify_user_funds(user_id_2, useful_orders_in_bid_book[0].output_coin, input_amount, 'add', true);
+            macht_orders_2(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, useful_orders_in_bid_book, counter, sum);
             
         }
-
-    // }
-    //buy
-    // else if( side=='buy' ){
-
-                                                        
-    // }
 
 }
 
@@ -121,41 +89,100 @@ async function create_trade(order_id_1, execution_price, order_id_2){
 }
 
 
-async function execute_exactly_matching_trade_market(order_id_1, order_id_2){
+async function macht_orders(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, useful_orders_in_book){
 
+    console.log("calicho 3")
+
+    let order_id_1 = order_id;
+
+    const exec_price = useful_orders_in_book[0].execution_price;
+    const order_id_2 = useful_orders_in_book[0].order_id
+
+    create_trade(order_id, exec_price, order_id_2);
+
+    
     const q1 = `UPDATE orders SET close_date = NOW(), status = 'close' WHERE order_id = $1`;
     const result1 = await pool.query( q1, [ order_id_1 ] );
     const result1_2 = await pool.query( q1, [ order_id_2 ] );
 
-    const q2 = `SELECT transaction_id, order_type  FROM orders WHERE order_id = $1 `;
-    const result2 = await pool.query( q2, [ order_id_1 ] );
-    const result2_2 = await pool.query( q2, [ order_id_2 ] );
+    let transac_id_1 = transaction_id;
+    let transac_id_2 = useful_orders_in_book[0].transaction_id;
 
-    let transac_id_1 = result2.rows[0].transaction_id;
-    let transac_id_2 = result2_2.rows[0].transaction_id;
+    //*********** */
 
-    let order_type_1 = result2.rows[0].order_type;
-    let order_type_2 = result2_2.rows[0].order_type; //this one is always limit
+    let user_id_1 = user_id;
+    let user_id_2 = useful_orders_in_book[0].user_id;
+    
+    const q4 = `UPDATE coin_exchange SET output_amount = $1 WHERE transaction_id = $2`;
+    const result4 = await pool.query( q4, [ useful_orders_in_book[0].input_amount, transac_id_1 ] ); 
 
     
 
-        const q3 = `SELECT input_amount, user_id, input_coin, output_coin FROM coin_exchange WHERE transaction_id = $1`;
-        const result3 = await pool.query( q3, [ transac_id_1 ] );
-        const result3_2 = await pool.query( q3, [ transac_id_2 ] );
+    modify_user_funds(user_id_1, input_coin, input_amount, 'sub', false, true);
+    modify_user_funds(user_id_1, output_coin, useful_orders_in_book[0].input_amount, 'add', true);
 
-        let user_id_1 = result3.rows[0].user_id;
-        let user_id_2 = result3_2.rows[0].user_id;
-        
-        const q4 = `UPDATE coin_exchange SET output_amount = $1 WHERE transaction_id = $2`;
-        const result4 = await pool.query( q4, [ result3_2.rows[0].input_amount, transac_id_1 ] );       
-
-        modify_user_funds(user_id_1, result3.rows[0].output_coin, )
-
-    
-
-
+    modify_user_funds(user_id_2, useful_orders_in_book[0].input_coin, useful_orders_in_book[0].input_amount, 'sub', false, true);
+    modify_user_funds(user_id_2, useful_orders_in_book[0].output_coin, input_amount, 'add', true);    
 
 }
+
+
+async function macht_orders_2(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, useful_orders_in_book, counter, sum){
+
+    const q1 = `UPDATE orders SET close_date = NOW(), status = 'close' WHERE order_id = $1`;
+    let temp = 0;
+    
+    for(let index=0; index<counter; index++) {
+
+    console.log("calicho 3  ", index)
+
+    let order_id_1 = order_id;
+
+    const exec_price = useful_orders_in_book[index].execution_price;
+    const order_id_2 = useful_orders_in_book[index].order_id
+
+    create_trade(order_id, exec_price, order_id_2);
+
+    
+    //const q1 = `UPDATE orders SET close_date = NOW(), status = 'close' WHERE order_id = $1`;
+    // const result1 = await pool.query( q1, [ order_id_1 ] );
+    const result1_2 = await pool.query( q1, [ order_id_2 ] );
+
+    let transac_id_1 = transaction_id;
+    let transac_id_2 = useful_orders_in_book[index].transaction_id;
+
+    //*********** */
+
+    let user_id_1 = user_id;
+    let user_id_2 = useful_orders_in_book[index].user_id;
+    
+     const q4 = `UPDATE coin_exchange SET output_amount = $1 WHERE transaction_id = $2`;
+     const q5 = `SELECT output_amount FROM coin_exchange WHERE transaction_id = $1`;
+
+     const result5 = await pool.query( q5, [ transac_id_2 ] ); 
+     //temp = result5.rows[0].output_amount;
+     console.log(temp, "   jose");
+     temp = temp + useful_orders_in_book[index].input_amount;
+     console.log(temp, "   jose 2");
+
+     const result4 = await pool.query( q4, [ temp, transac_id_1 ] ); 
+    
+    console.log('paul');
+    modify_user_funds(user_id_1, input_coin, useful_orders_in_book[index].output_amount, 'sub', false, true);
+    console.log('paul 2');
+    modify_user_funds(user_id_1, output_coin, useful_orders_in_book[index].input_amount, 'add', true);
+    
+    console.log('paul 3');
+    modify_user_funds(user_id_2, useful_orders_in_book[index].input_coin, useful_orders_in_book[index].input_amount, 'sub', false, true);
+    console.log('paul 4');
+    modify_user_funds(user_id_2, useful_orders_in_book[index].output_coin, useful_orders_in_book[index].output_amount, 'add', true);    
+
+    }
+
+    const result1 = await pool.query( q1, [ order_id ] );
+
+}
+
 
 
 

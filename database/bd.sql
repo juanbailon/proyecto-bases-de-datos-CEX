@@ -265,3 +265,11 @@ creation_date
 close_date
 order_type
 execution_price
+
+
+
+
+SELECT coin_exchange.user_id, orders.order_id, orders.transaction_id, orders.order_type, coin_exchange.input_coin, coin_exchange.output_coin, coin_exchange.input_amount, coin_exchange.output_amount, orders.execution_price FROM 
+                        (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) 
+                            WHERE orders.order_book_id = $1 AND orders.order_type = $2 AND orders.side = $3 AND status!= 'close' AND coin_exchange.user_id != $4
+                                ORDER BY orders.execution_price ASC
