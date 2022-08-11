@@ -220,7 +220,29 @@ CREATE TABLE liquidity_providers (
        ( (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) 
          INNER JOIN bid_book ON orders.order_id = bid_book.order_id )
            ORDER BY coin_exchange.input_amount ASC;
-           
+  
+  
+  --esta si
+  SELECT orders.order_id, orders.transaction_id, coin_exchange.input_amount, orders.execution_price FROM 
+        (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) 
+          WHERE orders.order_book_id = 1 AND orders.order_type = 'limit' AND orders.side = 'buy'
+           ORDER BY orders.execution_price ASC;
+
+
+
+
+  SELECT orders.order_id, orders.transaction_id, coin_exchange.input_amount, orders.execution_price FROM 
+       ( (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) 
+         INNER JOIN bid_book ON orders.order_id = bid_book.order_id )
+           ORDER BY orders.execution_price ASC;           
+
+
+
+  SELECT * FROM 
+       ( (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) 
+         INNER JOIN bid_book ON orders.order_id = bid_book.order_id )
+           ORDER BY coin_exchange.input_amount ASC;           
+
 
   SELECT orders.order_id, orders.transaction_id, coin_exchange.input_amount FROM bid_book WHERE order_id IN (
     SELECT orders.order_id FROM 
@@ -228,6 +250,14 @@ CREATE TABLE liquidity_providers (
           WHERE order_type='limit' );
             
 
+
+
+  ALTER TABLE trades
+    ADD CONSTRAINT fk_order_id_2
+      FOREIGN KEY (order_id_2)
+        REFERENCES orders(order_id);
+
+  UPDATE user_coins SET total= , available= , in_orders = WHERE id= ;        
 
   order_id
 transaction_id

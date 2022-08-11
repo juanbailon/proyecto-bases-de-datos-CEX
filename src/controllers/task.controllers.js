@@ -73,7 +73,7 @@ const getTrade = (req, res, next) => {
 
 const trade_limit = async (req, res, next) => {
 
-    const {userId, input_coin, output_coin, input_amount, output_amount, price, exchange_pair, order_type} = req.body;  //input_amount = amount
+    const {userId, input_coin, output_coin, input_amount, /* output_amount, */ price, exchange_pair, order_type} = req.body;  //input_amount = amount
     let fee = 1; //this is 1%
 
     try {
@@ -111,10 +111,17 @@ const trade_limit = async (req, res, next) => {
             
             let order_id = result3.rows[0].order_id;
             
-            determine_order_side(order_id, input_coin, output_coin, order_book_id);
+            determine_order_side(order_id, input_coin, output_coin, order_book_id); 
+
             modify_user_balance_to_create_order( userId, input_coin, input_amount, result0.rows[0].available, result0.rows[0].in_orders);
 
             if(order_type == "limit"){
+
+                const q6 = `SELECT side FROM orders WHERE order_id = $1`;
+                const result6 = await pool.query( q6, [ order_id ] );
+
+                let output_amount = ( result6.rows[0].side=='sell' )? input_amount*price : input_amount/price;
+                output_amount = output_amount.toFixed(8);
 
                 const q4 = `UPDATE coin_exchange SET output_amount = $1 WHERE transaction_id = $2`;
                 const result4 = await pool.query( q4, [ output_amount, transaction_id] );
@@ -128,7 +135,7 @@ const trade_limit = async (req, res, next) => {
             }
             else if (order_type == "market") {
 
-                //execute_market_order( order_id, input_coin, output_coin, input_amount, order_book_id );
+                execute_market_order( userId, order_id, transaction_id, input_coin, output_coin, input_amount, order_book_id );
                 res.json({message: "market order created sucesfully"});
 
                 

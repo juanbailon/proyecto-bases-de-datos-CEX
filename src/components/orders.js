@@ -77,10 +77,62 @@ async function determine_order_side(order_id, input_coin, output_coin, order_boo
 }
 
 
+async function modify_user_funds(user_id, ticker_symbol, amount, operation='add', modify_available=false, modify_in_orders=false, modify_in_liq_pools=false ){
+
+    const q1 = `SELECT id, user_id, total, available, in_orders, in_liq_pools FROM user_coins WHERE user_id = $1 AND ticker_symbol = $2`;
+    let result1 = await pool.query( q1, [ user_id, ticker_symbol ] );
+
+    console.log("jors");
+
+    if ( result1.rowCount == 0 ) {
+        console.log("jors  2");
+
+        const q2 = `INSERT INTO user_coins (user_id, ticker_symbol) VALUES ($1, $2)`;
+        const result2 = await pool.query( q2, [ user_id, ticker_symbol ] );
+
+        result1 = await pool.query( q1, [ user_id, ticker_symbol ] );
+
+        console.log("calicho");
+    }
+    
+
+    const q3 = `UPDATE user_coins SET total = $1, available = $2, in_orders = $3, in_liq_pools = $4 WHERE id = $5`;
+    
+    let new_total, new_available, new_in_orders, new_in_liq_pools; 
+
+    if( operation == 'add' ){
+
+        new_total = result1.rows[0].total + amount;
+
+        new_available = ( modify_available==true )? result1.rows[0].available + amount : result1.rows[0].available ;
+
+        inew_in_orders = ( modify_in_orders==true )? result1.rows[0].in_orders + amount : result1.rows[0].in_orders ;
+
+        new_in_liq_pools = ( modify_in_liq_pools==true )? result1.rows[0].in_liq_pools + amount : result1.rows[0].in_liq_pools ;
+
+        const result3 = await pool.query( q3, [ new_total, new_available, new_in_orders, new_in_liq_pools, result1.rows[0].id ] );
+    }
+    else if( operation == 'subtract' || operation == 'sub' ){
+
+        new_total = result1.rows[0].total - amount;
+
+        new_available = ( modify_available==true )? result1.rows[0].available - amount : result1.rows[0].available ;
+
+        new_in_orders = ( modify_in_orders==true )? result1.rows[0].in_orders - amount : result1.rows[0].in_orders ;
+
+        new_in_liq_pools = ( modify_in_liq_pools==true )? result1.rows[0].in_liq_pools - amount : result1.rows[0].in_liq_pools ;
+
+        const result3 = await pool.query( q3, [ new_total, new_available, new_in_orders, new_in_liq_pools, result1.rows[0].id ] );
+    }
+
+}
+
+
 
 module.exports = {
     add_limit_order_to_books,
     determine_order_side,
-    modify_user_balance_to_create_order
+    modify_user_balance_to_create_order,
+    modify_user_funds
 
 };
