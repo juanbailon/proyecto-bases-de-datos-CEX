@@ -82,17 +82,13 @@ async function modify_user_funds(user_id, ticker_symbol, amount, operation='add'
     const q1 = `SELECT id, user_id, total, available, in_orders, in_liq_pools FROM user_coins WHERE user_id = $1 AND ticker_symbol = $2`;
     let result1 = await pool.query( q1, [ user_id, ticker_symbol ] );
 
-    console.log("jors");
 
     if ( result1.rowCount == 0 ) {
-        console.log("jors  2");
 
         const q2 = `INSERT INTO user_coins (user_id, ticker_symbol, total, available, in_orders, in_liq_pools) VALUES ($1, $2, $3, $4, $6, $6)`;
         const result2 = await pool.query( q2, [ user_id, ticker_symbol, 0, 0, 0, 0 ] );
 
         result1 = await pool.query( q1, [ user_id, ticker_symbol ] );
-
-        console.log("calicho");
     }
     
 

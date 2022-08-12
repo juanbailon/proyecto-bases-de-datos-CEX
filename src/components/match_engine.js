@@ -4,14 +4,10 @@ const { modify_user_funds } = require('./orders');
 
 async function execute_market_order(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, order_book_id){
 
-    console.log("calicho 1")
-
     const q0 = `SELECT side FROM orders WHERE order_id= $1` ;
     const result0 = await pool.query( q0, [order_id] );
 
     const side = result0.rows[0].side;
-
-        console.log("calicho 2")
 
         let result2, q2;
 
@@ -35,22 +31,16 @@ async function execute_market_order(user_id, order_id, transaction_id, input_coi
         }
 
         const useful_orders_in_bid_book =  result2.rows;
-
-        console.log(useful_orders_in_bid_book)    
+          
 
         let sum = 0;
         let counter =0;
         
         while( sum < input_amount ){
-            console.log(result2.rows[counter].output_amount);
             sum += result2.rows[counter].output_amount;
             counter++;
-            console.log(sum, " &&&&&&&&&&&&&&&&&&&")
         }
 
-        console.log(sum)
-        console.log(counter)
-        console.log(input_amount)
 
         if( sum==input_amount && counter==1 ){
 
@@ -74,8 +64,6 @@ async function create_trade(order_id_1, execution_price, order_id_2){
 
 
 async function macht_orders(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, useful_orders_in_book){
-
-    console.log("calicho 3")
 
     let order_id_1 = order_id;
 
@@ -115,9 +103,7 @@ async function macht_orders_2(user_id, order_id, transaction_id, input_coin, out
     const q1 = `UPDATE orders SET close_date = NOW(), status = 'close' WHERE order_id = $1`;
     let temp = 0;
     
-    for(let index=0; index<counter; index++) {
-
-    console.log("calicho 3  ", index)
+    for(let index=0; index<counter; index++) {    
 
     let order_id_1 = order_id;
 
@@ -143,21 +129,16 @@ async function macht_orders_2(user_id, order_id, transaction_id, input_coin, out
      const q5 = `SELECT output_amount FROM coin_exchange WHERE transaction_id = $1`;
 
      const result5 = await pool.query( q5, [ transac_id_2 ] ); 
-     //temp = result5.rows[0].output_amount;
-     console.log(temp, "   jose");
+
      temp = temp + useful_orders_in_book[index].input_amount;
-     console.log(temp, "   jose 2");
 
      const result4 = await pool.query( q4, [ temp, transac_id_1 ] ); 
     
-    console.log('paul');
-    modify_user_funds(user_id_1, input_coin, useful_orders_in_book[index].output_amount, 'sub', false, true);
-    console.log('paul 2');
-    modify_user_funds(user_id_1, output_coin, useful_orders_in_book[index].input_amount, 'add', true);
     
-    console.log('paul 3');
+    modify_user_funds(user_id_1, input_coin, useful_orders_in_book[index].output_amount, 'sub', false, true);    
+    modify_user_funds(user_id_1, output_coin, useful_orders_in_book[index].input_amount, 'add', true);
+        
     modify_user_funds(user_id_2, useful_orders_in_book[index].input_coin, useful_orders_in_book[index].input_amount, 'sub', false, true);
-    console.log('paul 4');
     modify_user_funds(user_id_2, useful_orders_in_book[index].output_coin, useful_orders_in_book[index].output_amount, 'add', true);    
 
     }
@@ -170,14 +151,10 @@ async function macht_orders_2(user_id, order_id, transaction_id, input_coin, out
 
 async function execute_limit_order(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, output_amount, execution_price, order_book_id){
 
-    console.log("calicho 1 limit")
-
     const q0 = `SELECT side FROM orders WHERE order_id= $1` ;
     const result0 = await pool.query( q0, [order_id] );
 
-    const side = result0.rows[0].side;
-
-        console.log("calicho 2")
+    const side = result0.rows[0].side;        
 
         let result2, result3, q2, q3;
 
@@ -223,28 +200,20 @@ async function execute_limit_order(user_id, order_id, transaction_id, input_coin
 
         if( result2.rowCount == 0 ){
             return 0;
-        }
-
-        console.log(useful_orders_in_bid_book)    
+        }    
 
         let sum = 0;
         let counter =0;
         
         while( sum < input_amount ){
-            console.log(result2.rows[counter].output_amount);
             sum += result2.rows[counter].output_amount;
             counter++;
-            console.log(sum, " &&&&&&&&&&&&&&&&&&&")
         }
 
-        console.log(sum)
-        console.log(counter)
-        console.log(input_amount)
 
         if( sum==input_amount ){
 
-            macht_orders_2(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, useful_orders_in_bid_book, counter, sum);
-            
+            macht_orders_2(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, useful_orders_in_bid_book, counter, sum);            
         }
 
 }

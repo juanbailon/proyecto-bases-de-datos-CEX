@@ -21,7 +21,6 @@ const signIn = async (req, res, next) => {
     try {
         const result = await pool.query('SELECT email, password FROM users WHERE email= $1 AND password= $2', [email, password]);
     
-        console.log(result);
         if(result.rowCount == 0){
             res.json({ message: "login fail, the follow credentials are wront", credentials: {'email': email, 'password': password} });
         }
@@ -53,7 +52,7 @@ const createNewUser = async (req, res, next) => {
         const result = await pool.query('INSERT INTO users(email, password) VALUES ($1, $2) RETURNING *',
                                        [email, password]);
     
-        console.log(result);
+        
         res.json(result.rows[0]);
 
     } catch (error) {
