@@ -1,13 +1,6 @@
 const pool = require('../db');
 const { modify_user_funds } = require('./orders');
 
-async function macth_limit_order(order_id, ){
-
-    const q2 = `SELECT order_book_id FROM orders WHERE order_id = $1`;
-    const result2 = await pool.query( q2, [order_id] );
-
-}
-
 
 async function execute_market_order(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, order_book_id){
 
@@ -258,7 +251,6 @@ async function execute_limit_order(user_id, order_id, transaction_id, input_coin
 
 
 module.exports = {
-    macth_limit_order,
     execute_market_order,
     execute_limit_order
 };
