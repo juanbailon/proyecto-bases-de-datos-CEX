@@ -18,15 +18,6 @@ async function execute_market_order(user_id, order_id, transaction_id, input_coi
 
     const side = result0.rows[0].side;
 
-    const q20 =  `SELECT coin_exchange.user_id, orders.order_id, orders.transaction_id, orders.order_type, coin_exchange.input_coin, coin_exchange.output_coin, coin_exchange.input_amount, coin_exchange.output_amount, orders.execution_price FROM ` +
-                        `(orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) `  +
-                            `WHERE orders.order_book_id = $1 AND orders.order_type = $2 AND orders.side = $3 AND status!= 'close'` +
-                                `ORDER BY orders.execution_price DESC` ;
-
-
-    //sell
-    // if( side == 'sell' ){ 
-
         console.log("calicho 2")
 
         let result2, q2;
@@ -117,7 +108,6 @@ async function macht_orders(user_id, order_id, transaction_id, input_coin, outpu
     const result4 = await pool.query( q4, [ useful_orders_in_book[0].input_amount, transac_id_1 ] ); 
 
     
-
     modify_user_funds(user_id_1, input_coin, input_amount, 'sub', false, true);
     modify_user_funds(user_id_1, output_coin, useful_orders_in_book[0].input_amount, 'add', true);
 
@@ -184,6 +174,86 @@ async function macht_orders_2(user_id, order_id, transaction_id, input_coin, out
 }
 
 
+async function execute_limit_order(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, output_amount, execution_price, order_book_id){
+
+    console.log("calicho 1 limit")
+
+    const q0 = `SELECT side FROM orders WHERE order_id= $1` ;
+    const result0 = await pool.query( q0, [order_id] );
+
+    const side = result0.rows[0].side;
+
+        console.log("calicho 2")
+
+        let result2, result3, q2, q3;
+
+        q2 = `SELECT coin_exchange.user_id, orders.order_id, orders.transaction_id, orders.creation_date, orders.order_type, coin_exchange.input_coin, coin_exchange.output_coin, coin_exchange.input_amount, coin_exchange.output_amount, orders.execution_price FROM ` +
+         `      (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) ` +
+                    `WHERE orders.order_book_id = $1 AND orders.order_type = $2 AND orders.side = $3 AND status!= 'close' AND coin_exchange.user_id != $4 AND orders.execution_price = $5 ` +
+                        `ORDER BY orders.creation_date ASC` ; 
+
+
+        q3 = `SELECT coin_exchange.user_id, orders.order_id, orders.transaction_id, orders.creation_date, orders.order_type, coin_exchange.input_coin, coin_exchange.output_coin, coin_exchange.input_amount, coin_exchange.output_amount, orders.execution_price FROM ` +
+        `      (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) ` +
+                    `WHERE orders.order_book_id = $1 AND orders.order_type = $2 AND orders.side = $3 AND status!= 'close' AND coin_exchange.user_id != $4 AND orders.execution_price = $5 AND coin_exchange.output_amount = $6 ` +
+                        `ORDER BY orders.creation_date ASC` ; 
+
+                        
+
+        if( side == 'sell' ){
+        
+            result2 = await pool.query( q2, [order_book_id, 'limit', 'buy', user_id, execution_price] );
+
+            result3 = await pool.query( q3, [order_book_id, 'limit', 'buy', user_id, execution_price, input_amount] );
+        }
+        else if( side == "buy"){
+
+            result2 = await pool.query( q2, [order_book_id, 'limit', 'sell', user_id, execution_price] );
+
+            result3 = await pool.query( q3, [order_book_id, 'limit', 'sell', user_id, execution_price, input_amount] );
+        }
+
+
+        let  useful_orders_in_bid_book;
+
+        if( result3.rowCount > 0 ){
+
+            useful_orders_in_bid_book =  result3.rows;
+
+            macht_orders(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, useful_orders_in_bid_book);
+
+            return 0;
+        }
+
+        useful_orders_in_bid_book =  result2.rows;
+
+        if( result2.rowCount == 0 ){
+            return 0;
+        }
+
+        console.log(useful_orders_in_bid_book)    
+
+        let sum = 0;
+        let counter =0;
+        
+        while( sum < input_amount ){
+            console.log(result2.rows[counter].output_amount);
+            sum += result2.rows[counter].output_amount;
+            counter++;
+            console.log(sum, " &&&&&&&&&&&&&&&&&&&")
+        }
+
+        console.log(sum)
+        console.log(counter)
+        console.log(input_amount)
+
+        if( sum==input_amount ){
+
+            macht_orders_2(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, useful_orders_in_bid_book, counter, sum);
+            
+        }
+
+}
 
 
 function limit_order_totally_completed(){
@@ -202,5 +272,6 @@ function exchange_funds_between_traders( trader1_order_id, trader2_order_id ){
 
 module.exports = {
     macth_limit_order,
-    execute_market_order
+    execute_market_order,
+    execute_limit_order
 };

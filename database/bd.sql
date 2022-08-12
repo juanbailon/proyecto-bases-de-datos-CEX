@@ -272,4 +272,11 @@ execution_price
 SELECT coin_exchange.user_id, orders.order_id, orders.transaction_id, orders.order_type, coin_exchange.input_coin, coin_exchange.output_coin, coin_exchange.input_amount, coin_exchange.output_amount, orders.execution_price FROM 
                         (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) 
                             WHERE orders.order_book_id = $1 AND orders.order_type = $2 AND orders.side = $3 AND status!= 'close' AND coin_exchange.user_id != $4
-                                ORDER BY orders.execution_price ASC
+                                ORDER BY orders.execution_price ASC;
+
+
+
+SELECT coin_exchange.user_id, orders.order_id, orders.transaction_id, orders.creation_date, orders.order_type, coin_exchange.input_coin, coin_exchange.output_coin, coin_exchange.input_amount, coin_exchange.output_amount, orders.execution_price FROM 
+                        (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) 
+                            WHERE orders.order_book_id = 1 AND orders.order_type = 'limit' AND orders.side = 'sell' AND status!= 'close' AND coin_exchange.user_id != 2 AND orders.execution_price = 2000 AND coin_exchange.output_amount = 2000
+                                ORDER BY orders.creation_date ASC;                                

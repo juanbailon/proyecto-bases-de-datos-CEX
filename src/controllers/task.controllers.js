@@ -1,6 +1,6 @@
 const pool = require('../db');
 const {  create_basic_coin_exchange, create_basic_order, make_basic_order_limit, add_limit_order_to_books, determine_order_side, modify_user_balance_to_create_order } = require('../components/orders');
-const { macth_limit_order, execute_market_order } = require('../components/match_engine');
+const { macth_limit_order, execute_market_order, execute_limit_order } = require('../components/match_engine');
 
 
 const getLogin = (req, res, next) => {
@@ -140,6 +140,9 @@ const trade_limit = async (req, res, next) => {
                 add_limit_order_to_books(order_id, order_book_id);
 
                 res.json({message: `limit order created sucesfully`});
+
+                execute_limit_order( userId, order_id, transaction_id, input_coin, output_coin, input_amount, output_amount, price, order_book_id );
+
             }
             else if (order_type == "market") {
 
