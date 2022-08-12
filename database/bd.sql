@@ -280,3 +280,10 @@ SELECT coin_exchange.user_id, orders.order_id, orders.transaction_id, orders.cre
                         (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id) 
                             WHERE orders.order_book_id = 1 AND orders.order_type = 'limit' AND orders.side = 'sell' AND status!= 'close' AND coin_exchange.user_id != 2 AND orders.execution_price = 2000 AND coin_exchange.output_amount = 2000
                                 ORDER BY orders.creation_date ASC;                                
+
+
+
+
+SELECT order_id, input_coin, output_coin, input_amount, output_amount, creation_date, close_date, order_type, execution_price, side, status FROM 
+                  (orders INNER JOIN coin_exchange ON orders.transaction_id = coin_exchange.transaction_id ) 
+                        WHERE coin_exchange.user_id = $1

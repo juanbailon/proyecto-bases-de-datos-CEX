@@ -174,6 +174,50 @@ async function macht_orders_2(user_id, order_id, transaction_id, input_coin, out
 }
 
 
+async function macht_orders_3(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, useful_orders_in_book, index){
+
+    console.log("calicho 3")
+
+    let order_id_1 = order_id;
+
+    const exec_price = useful_orders_in_book[index].execution_price;
+    const order_id_2 = useful_orders_in_book[index].order_id
+
+    create_trade(order_id, exec_price, order_id_2);
+
+    
+    const q1 = `UPDATE orders SET close_date = NOW(), status = $1 WHERE order_id = $2`;
+    const result1 = await pool.query( q1, [ 'close', order_id_1 ] );
+    const result1_2 = await pool.query( q1, [ 'parcial', order_id_2 ] );
+
+    let transac_id_1 = transaction_id;
+    let transac_id_2 = useful_orders_in_book[index].transaction_id;
+
+    //*********** */
+
+    let user_id_1 = user_id;
+    let user_id_2 = useful_orders_in_book[index].user_id;
+    
+    const q4 = `UPDATE coin_exchange SET output_amount = $1 WHERE transaction_id = $2`;
+    const q5 = `SELECT output_amount FROM coin_exchange WHERE transaction_id = $1`;
+
+    const result5 = await pool.query( q5, [ transac_id_2 ] );
+
+    let temp = result5.rows[0].output_amount;
+    temp = temp + useful_orders_in_book[index].input_amount;
+
+    const result4 = await pool.query( q4, [ useful_orders_in_book[index].input_amount, transac_id_1 ] ); 
+
+    
+    modify_user_funds(user_id_1, input_coin, useful_orders_in_book[index].output_amount, 'sub', false, true);
+    modify_user_funds(user_id_1, output_coin, useful_orders_in_book[index].input_amount, 'add', true);
+
+    modify_user_funds(user_id_2, useful_orders_in_book[index].input_coin, useful_orders_in_book[index].input_amount, 'sub', false, true);
+    modify_user_funds(user_id_2, useful_orders_in_book[index].output_coin, useful_orders_in_book[index].output_amount, 'add', true);    
+
+}
+
+
 async function execute_limit_order(user_id, order_id, transaction_id, input_coin, output_coin, input_amount, output_amount, execution_price, order_book_id){
 
     console.log("calicho 1 limit")
