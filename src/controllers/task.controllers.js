@@ -248,6 +248,28 @@ const getUserOrders = async (req, res, next) => {
     res.send( result1.rows );
 }
 
+const depositFunds = async (req, res, next) => {
+
+    const {userId, ticker_symbol, amount} =  req.body;
+
+    const q1 = `SELECT * FROM user_coins WHERE user_id = $1 AND ticker_symbol = $2`;
+    const result1 = await pool.query( q1, [userId, ticker_symbol] );
+
+    if( result1.rowCount == 0 ){
+        const q2 = `INSERT INTO user_coins ( user_id, ticker_symbol, total, available, in_orders, in_liq_pools) VALUES ($1, $2, $3, $4, $5, $6)`;
+        const result2 = await pool.query( q2, [userId, ticker_symbol, amount, amount, 0, 0] );
+
+        res.send("deposit suceesfull");
+    }
+    else{
+        const q3 = `UPDATE user_coins SET total = $1, available = $2 WHERE user_id = $3 AND ticker_symbol = $4`;
+        const result3 = await pool.query( q3, [result1.rows[0].total + amount, result1.rows[0].available + amount, userId, ticker_symbol] );
+        res.send("deposit suceesfull");
+    }
+
+}
+
+
 const deleteLimitOrder = async (req, res, next) => {
 
     const {order_id} =  req.body;
@@ -371,5 +393,6 @@ module.exports = {
     getOrders,
     getOrdersInfo,
     getUserOrders,
-    deleteLimitOrder
+    deleteLimitOrder,
+    depositFunds
 };
