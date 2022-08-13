@@ -14,7 +14,11 @@ CREATE TABLE users (
   CREATE TABLE user_coins (
     id SERIAL PRIMARY KEY,
     user_id integer NOT NULL,
-    ticker_symbol VARCHAR(6) NOT NULL, 
+    ticker_symbol VARCHAR(6) NOT NULL,
+    total integer,
+    available integer,
+    in_orders integer,
+    in_liq_pools integer, 
 
     CONSTRAINT fk_user
       FOREIGN KEY(user_id) 
