@@ -4,7 +4,7 @@
 git clone https://github.com/juanbailon/proyecto-bases-de-datos-CEX.git
 ```
 
-2) ingrese a prostgresSQL en la terminal y ejecute los siguientes comandos, postgres debe de estar instalado en su maquina local (**NO** Docker)
+2) ingrese a prostgresSQL en la terminal y ejecute los siguientes comandos, postgres debe de estar instalado en su maquina local (**NO** Docker). Todos estos comandos estann en el archivo _database/bd.sql_
 ```sql
 CREATE DATABASE crypto_exchange;
 ```
@@ -202,5 +202,30 @@ CREATE TABLE liquidity_providers (
 
 <br>
 
-3 )   
+3. configure las credenciales  para acceder a la base de datos, en el archivo **db.js**
+<br>
+-- ejemplo:
 
+```js
+const pool = new Pool( {
+    user: 'postgres',
+    password: 'pg123',
+    host: 'localhost',
+    port: 5432,
+    database: 'crypto_exchange'
+} );
+```
+
+<br>
+
+4) Usando una herramienta para usar la API, como por ejemplo _postman_, para las siguientes explicaciones usaremos Thunder Client, el cual lo podra encontrar en las extenciones de visual studio code
+
+5) en thunder client coloque http://localhost:4000/sign-up y realiceun POST para asi crear un nuevo usuario, coloque lo siguiente en el *body* del request(de click en la opcion Body y luego en la opcion Json, que presenta thunder client)
+<br>
+en el campo de texto que se le presenta coloque lo siguiente:
+```json
+{
+    "email": "yourEmail@example.com",
+    "password": "12345"
+}
+```
