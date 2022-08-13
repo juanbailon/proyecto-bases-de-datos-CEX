@@ -223,7 +223,7 @@ const pool = new Pool( {
 5) en thunder client coloque http://localhost:4000/sign-up y realiceun POST para asi crear un nuevo usuario, coloque lo siguiente en el *body* del request(de click en la opcion Body y luego en la opcion Json, que presenta thunder client)
 <br>
 en el campo de texto que se le presenta coloque lo siguiente:
-```json
+```js
 {
     "email": "yourEmail@example.com",
     "password": "12345"
