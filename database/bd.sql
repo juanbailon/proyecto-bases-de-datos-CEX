@@ -189,6 +189,13 @@ INSERT INTO coins (ticker_symbol, coin_name)
 
 INSERT INTO order_book (order_book_id, exchange_pair, coin_1, coin_2, bid_book_id, ask_book_id ) 
   VALUES (1, 'BTC/USDT', 'BTC', 'USDT', 1, 1 ),
-         (2, 'ADA/USDT', 'ADA', 'USDT', 2, 2 );   
+         (2, 'ADA/USDT', 'ADA', 'USDT', 2, 2 );
 
+INSERT INTO liquidity_pools (exchange_pair, coin_1, coin_2, amount_coin_1, amount_coin_2, estimated_apy ) 
+  VALUES ('BTC/USDT', 'BTC', 'USDT', 20, 2000, 4 );   
+
+
+INSERT INTO exchange_pair_books(exchange_pair, order_book_id, bid_book_id, ask_book_id)
+  VALUES ('BTC/USDT', 1, 1, 1),
+         ('ADA/USDT', 2, 2, 2);
                
