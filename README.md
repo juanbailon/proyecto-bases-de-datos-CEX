@@ -211,6 +211,14 @@ INSERT INTO order_book (order_book_id, exchange_pair, coin_1, coin_2, bid_book_i
   VALUES (1, 'BTC/USDT', 'BTC', 'USDT', 1, 1 ),
          (2, 'ADA/USDT', 'ADA', 'USDT', 2, 2 ); 
 
+INSERT INTO liquidity_pools (exchange_pair, coin_1, coin_2, amount_coin_1, amount_coin_2, estimated_apy ) 
+  VALUES ('BTC/USDT', 'BTC', 'USDT', 20, 2000, 4 );   
+
+
+INSERT INTO exchange_pair_books(exchange_pair, order_book_id, bid_book_id, ask_book_id)
+  VALUES ('BTC/USDT', 1, 1, 1),
+         ('ADA/USDT', 2, 2, 2);         
+
 ```
 
 <br>
@@ -448,6 +456,46 @@ Ahora debido a la accion que acabamos de realizar, si revisamos los fondos del u
 Esos 3 bitcoins que se intercambieron salieron de las 2 ordenes limite que hizo el user_id=1 en el paso 9, y a cambio recibio 5000 USDT que fue la cantidad ingresada por user_id=2 al momento de realizar su orden de mercado.
 
 Dedido a lo anterior ahora tendriamos 3 ordenes con un **status** = 'close', ya que se realizaron trades para dos ordes limite y una orden de mercado (las mencionadas anteriormente)
+
+<br>
+<br>
+
+12)
+ Ahora crearemos dos ordenes limit, para que se genere un intercambio entre ambas ordenes limite.
+
+ siguiendo los pasos del punto 9, creamos ambas ordenes con las siguientes especificaciones:
+
+ ```json
+ {
+    "userId": 1,
+    "input_coin": "USDT",
+    "output_coin": "ADA",
+    "input_amount": 200,
+    "price": 2,
+    "exchange_pair": "ADA/USDT",
+    "order_type": "limit"
+}
+ ```
+
+ ```json
+ {
+    "userId": 3,
+    "input_coin": "ADA",
+    "output_coin": "USDT",
+    "input_amount": 100,
+    "price": 2,
+    "exchange_pair": "ADA/USDT",
+    "order_type": "limit"
+}
+```
+
+<br>
+
+una vez realizadas las ordenes, podremos ver consultando los fondos de user_id=1 y user_id=3, que los interncambios fueron realizados, y ahora el user_id=3 tiene una nueva moneda en sus fondos(USDT), y el usuario_id=1 tambien(ADA)
+
+
+
+
 
 
 
