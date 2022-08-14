@@ -180,3 +180,9 @@ CREATE TABLE liquidity_providers (
         REFERENCES liquidity_pools(liquidity_pool_id)
         ON DELETE SET NULL
 );
+
+
+INSERT INTO coins (ticker_symbol, coin_name) 
+  VALUES ('BTC', 'bitcoin'),
+         ('USDT', 'tether_USD'),
+         ('ADA', 'cardano_ADA');

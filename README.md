@@ -202,7 +202,7 @@ CREATE TABLE liquidity_providers (
 
 <br>
 
-3. configure las credenciales  para acceder a la base de datos, en el archivo **db.js**
+3. configure las credenciales  para acceder a la base de datos, en el archivo **src/db.js**
 <br>
 -- ejemplo:
 
@@ -214,18 +214,68 @@ const pool = new Pool( {
     port: 5432,
     database: 'crypto_exchange'
 } );
+
+```
+
+4) Abra una terminal y dirijase a la ubicacion donde estan todos los archivos, una vez ahi ejecute lo siguente
+```sh
+your-path/proyecto-bases-de-datos-CEX$ npm install
+```
+luego ejecute
+```sh
+your-path/proyecto-bases-de-datos-CEX$ npm run dev
 ```
 
 <br>
 
-4) Usando una herramienta para usar la API, como por ejemplo _postman_, para las siguientes explicaciones usaremos Thunder Client, el cual lo podra encontrar en las extenciones de visual studio code
+5) Usando una herramienta para usar la API, como por ejemplo _postman_, para las siguientes explicaciones usaremos Thunder Client, el cual lo podra encontrar en las extenciones de visual studio code
 
-5) en thunder client coloque http://localhost:4000/sign-up y realiceun POST para asi crear un nuevo usuario, coloque lo siguiente en el *body* del request(de click en la opcion Body y luego en la opcion Json, que presenta thunder client)
+6) en thunder client coloque http://localhost:4000/sign-up y realice un **POST** para asi crear un nuevo usuario, coloque lo siguiente en el *body* del request(de click en la opcion Body y luego en la opcion Json, que presenta thunder client)
 <br>
-en el campo de texto que se le presenta coloque lo siguiente:
-```js
-{
-    "email": "yourEmail@example.com",
-    "password": "12345"
-}
+en el campo de texto que se le presenta coloque lo siguiente, presione ctrl+s al final de escribir:
+
+![img step 5](./images_readme/imagen_paso_5.png)
+
+<br>
+
+Press **Send**, then you should get a response like this 
+![](./images_readme/imagen_response_paso_5.png)
+
+<br>
+
+7) Cree como minimo 2 usuarios, si desea ver los usuarios creados haga el siguinte query en la base de datos
+```sql
+ SELECT * FROM users;
 ```
+
+<br>
+
+8) Ahora añada fondos a los usuarios que creo, haga un request **POST** a http://localhost:4000/deposit, de la siguiente forma (Presione ctrl + s, en la zona del json antes del envio)
+
+
+> _NOTA:_ Las monedas soportadas son las siguientes: _bitcoin,  cardano ada, tether usd_; las cuales tienen los ticker_symbol correspondientes  **BTC**, **ADA**, **USDT**
+>
+![](./images_readme/img_funding_user_account.png)
+
+> para los siguientes ejemplos se crearon 3 usuarios, con fondos de la siguiente forma: 
+>
+> - (usuario_1, 10 BTC, 8000 USDT);
+> - (usuario_2, 8 BTC, 12000 USDT);
+> - (usuario_3, 500 ADA)
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
