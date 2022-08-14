@@ -491,7 +491,26 @@ Dedido a lo anterior ahora tendriamos 3 ordenes con un **status** = 'close', ya 
 
 <br>
 
-una vez realizadas las ordenes, podremos ver consultando los fondos de user_id=1 y user_id=3, que los interncambios fueron realizados, y ahora el user_id=3 tiene una nueva moneda en sus fondos(USDT), y el usuario_id=1 tambien(ADA)
+una vez realizadas las ordenes, podremos ver consultando los fondos de user_id=1 y user_id=3, que los interncambios fueron realizados, y ahora el user_id=3 tiene una nueva moneda en sus fondos(USDT), y el usuario_id=1 tambien(ADA).
+
+<br>
+
+13) 
+Si uno de los usuarios deseara cancelar una de sus ordenes, debera hacer lo siguiente, debera hacer una peticion **DELETE** a http://localhost:4000/orders
+
+> **NOTA:** solo se puden cancelar las ordenes limite cuyo estatus es _**open**_. Para conocer el order_id busque entre sus ordenes, siga los pasos del punto 10
+
+Ya que user_id=2 aun tiene dos ordenes limite abiertas, cancelaremos una de ellas.
+
+![](./images_readme/img_delete_order.png)
+
+<br>
+
+si revisamos nuestras ordenes nuevamente veremos que una de las ordenes ya no esta, ya que fue eliminada.
+
+
+
+
 
 
 
