@@ -1,10 +1,13 @@
 # proyecto-bases-de-datos-CEX
-1)  clone the repo
+1)
+  clone the repo
 ```sh
 git clone https://github.com/juanbailon/proyecto-bases-de-datos-CEX.git
 ```
+<br>
 
-2) ingrese a prostgresSQL en la terminal y ejecute los siguientes comandos, postgres debe de estar instalado en su maquina local (**NO** Docker). Todos estos comandos estann en el archivo _database/bd.sql_
+2)
+ ingrese a prostgresSQL en la terminal y ejecute los siguientes comandos, postgres debe de estar instalado en su maquina local (**NO** Docker). Todos estos comandos estann en el archivo _database/bd.sql_
 ```sql
 CREATE DATABASE crypto_exchange;
 ```
@@ -212,7 +215,8 @@ INSERT INTO order_book (order_book_id, exchange_pair, coin_1, coin_2, bid_book_i
 
 <br>
 
-3. configure las credenciales  para acceder a la base de datos, en el archivo **src/db.js**
+3.
+ configure las credenciales  para acceder a la base de datos, en el archivo **src/db.js**
 <br>
 -- ejemplo:
 
@@ -227,7 +231,8 @@ const pool = new Pool( {
 
 ```
 
-4) Abra una terminal y dirijase a la ubicacion donde estan todos los archivos, una vez ahi ejecute lo siguente
+4) 
+Abra una terminal y dirijase a la ubicacion donde estan todos los archivos, una vez ahi ejecute lo siguente
 ```sh
 your-path/proyecto-bases-de-datos-CEX$ npm install
 ```
@@ -238,9 +243,13 @@ your-path/proyecto-bases-de-datos-CEX$ npm run dev
 
 <br>
 
-5) Usando una herramienta para usar la API, como por ejemplo _postman_, para las siguientes explicaciones usaremos Thunder Client, el cual lo podra encontrar en las extenciones de visual studio code
+5)
+ Usando una herramienta para usar la API, como por ejemplo _postman_, para las siguientes explicaciones usaremos Thunder Client, el cual lo podra encontrar en las extenciones de visual studio code
 
-6) en thunder client coloque http://localhost:4000/sign-up y realice un **POST** para asi crear un nuevo usuario, coloque lo siguiente en el *body* del request(de click en la opcion Body y luego en la opcion Json, que presenta thunder client)
+ <br>
+
+6)
+ en thunder client coloque http://localhost:4000/sign-up y realice un **POST** para asi crear un nuevo usuario, coloque lo siguiente en el *body* del request(de click en la opcion Body y luego en la opcion Json, que presenta thunder client)
 <br>
 en el campo de texto que se le presenta coloque lo siguiente, presione ctrl+s al final de escribir:
 
@@ -253,14 +262,16 @@ Press **Send**, then you should get a response like this
 
 <br>
 
-7) Cree como minimo 2 usuarios, si desea ver los usuarios creados haga el siguinte query en la base de datos
+7) 
+Cree como minimo 2 usuarios, si desea ver los usuarios creados haga el siguinte query en la base de datos
 ```sql
  SELECT * FROM users;
 ```
 
 <br>
 
-8) Ahora añada fondos a los usuarios que creo, haga un request **POST** a http://localhost:4000/deposit, de la siguiente forma (Presione ctrl + s, en la zona del json antes del envio)
+8)
+ Ahora añada fondos a los usuarios que creo, haga un request **POST** a http://localhost:4000/deposit, de la siguiente forma (Presione ctrl + s, en la zona del json antes del envio)
 
 
 > _NOTA:_ Las monedas soportadas son las siguientes: _bitcoin,  cardano ada, tether usd_; las cuales tienen los ticker_symbol correspondientes  **BTC**, **ADA**, **USDT**
@@ -298,7 +309,8 @@ obtendra esta la siguente respuesta
 <br>
 <br>
 
-9) para esta parte crearemos nuestras primeras ordenes limite.
+9)
+ para esta parte crearemos nuestras primeras ordenes limite.
  
  >primero se deben de hacer estas, ya que en el dessarrollo solo se contemplo para el caso de las ordenes de mercado en el cual ya existe liquidez sucifiente en los libros.
 
@@ -335,8 +347,7 @@ obtendra esta la siguente respuesta
 ```
 <br>
 procederemos a crear otras 3 ordernes limite con los siguientes valores:
-<br>
-{userId, input_coin, output_coin, input_amount, price, exchange_pair, order_type} 
+<br> 
 
 ```json
 {
@@ -349,6 +360,98 @@ procederemos a crear otras 3 ordernes limite con los siguientes valores:
     "order_type": "limit"
 }
 ```
+
+```json
+{
+    "userId": 2,
+    "input_coin": "BTC",
+    "output_coin": "USDT",
+    "input_amount": 2,
+    "price": 2000,
+    "exchange_pair": "BTC/USDT",
+    "order_type": "limit"
+}
+```
+
+```json
+{
+    "userId": 2,
+    "input_coin": "USDT",
+    "output_coin": "BTC",
+    "input_amount": 1000,
+    "price": 2000,
+    "exchange_pair": "BTC/USDT",
+    "order_type": "limit"
+}
+```
+
+<br>
+<br>
+
+10) 
+Para ver TODAS las ordenes realizadas por un usuario realice una peticion **GET** a http://localhost:4000/orders/:id
+
+![](./images_readme/img_user_orders.png)
+como resultado se obtendria una lista con todas las ordenes realizadas por el usuario con _**user_id**_ = 2
+
+<br>
+
+Hay otra forma de hacerlo, esta traera solo las ordenes que esten cerradas o abiertas, y es realizando un **POST** a http://localhost:4000/orders , con un body que contenga lo siguiente
+
+```json
+{
+    "userId": 2,
+    "status": "close"
+}
+```
+Esto nos treria todas las ordenes cerradas(ya terminadas, intercambiadas con exito) del user_id = 2. El **status** tiene solo dos estados _**open**_ o _**close**_
+
+<br>
+
+Si se desea ver las ordenes de todos los usuarios, entonces debera ejecutar la siguiente consulta en la base de datos
+
+```sql
+    SELECT * FROM orders;
+```
+<br>
+
+_**NOTA:**_ hasta heste momento por la forma y cantidades en las que realizamos las ordenes limite, no se ha realizado ningun trade/intercambio.
+
+<br>
+<br>
+
+11)
+ Ahora, para rebizar los fondos de un usuario haremos lo siguiente. Realizamos un **POST** a http://localhost:4000/funds 
+
+![](./images_readme/img_chekeando_fondos.png)
+<br>
+
+Para el caso anterior obtendriamos como respuesta:
+<br>
+![](./images_readme/img_response_checkeando_fondos.png)
+
+<br>
+<br>
+
+12) Ahora realizaremos la creacion de una orden de mercado(**market**), lo haremos de la siguiente forma, realizamos un **POST** a  http://localhost:4000/trade 
+
+<br>
+
+>Aqui veremos nuestro primer intercambio.
+
+![](./images_readme/img_crear_market_order.png)
+
+<br>
+
+Ahora debido a la accion que acabamos de realizar, si revisamos los fondos del user_id=2 este trendra 3 bitcoin de mas, y 5000 usd menos.
+
+Esos 3 bitcoins que se intercambieron salieron de las 2 ordenes limite que hizo el user_id=1 en el paso 9, y a cambio recibio 5000 USDT que fue la cantidad ingresada por user_id=2 al momento de realizar su orden de mercado.
+
+Dedido a lo anterior ahora tendriamos 3 ordenes con un **status** = 'close', ya que se realizaron trades para dos ordes limite y una orden de mercado (las mencionadas anteriormente)
+
+
+
+
 
 
 
