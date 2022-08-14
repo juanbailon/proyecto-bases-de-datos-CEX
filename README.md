@@ -198,6 +198,16 @@ CREATE TABLE liquidity_providers (
         REFERENCES liquidity_pools(liquidity_pool_id)
         ON DELETE SET NULL
 );
+
+INSERT INTO coins (ticker_symbol, coin_name) 
+  VALUES ('BTC', 'bitcoin'),
+         ('USDT', 'tether_USD'),
+         ('ADA', 'cardano_ADA');
+
+INSERT INTO order_book (order_book_id, exchange_pair, coin_1, coin_2, bid_book_id, ask_book_id ) 
+  VALUES (1, 'BTC/USDT', 'BTC', 'USDT', 1, 1 ),
+         (2, 'ADA/USDT', 'ADA', 'USDT', 2, 2 ); 
+
 ```
 
 <br>
@@ -234,12 +244,12 @@ your-path/proyecto-bases-de-datos-CEX$ npm run dev
 <br>
 en el campo de texto que se le presenta coloque lo siguiente, presione ctrl+s al final de escribir:
 
-![img step 5](./images_readme/imagen_paso_5.png)
+![img step 6](./images_readme/imagen_paso_6.png)
 
 <br>
 
 Press **Send**, then you should get a response like this 
-![](./images_readme/imagen_response_paso_5.png)
+![](./images_readme/imagen_response_paso_6.png)
 
 <br>
 
@@ -257,12 +267,91 @@ Press **Send**, then you should get a response like this
 >
 ![](./images_readme/img_funding_user_account.png)
 
+Presione **Send**, obtendra la siguiente respuesta
+
+![](./images_readme/img_response_funding_user_account.png)
+<br>
+<br>
+
 > para los siguientes ejemplos se crearon 3 usuarios, con fondos de la siguiente forma: 
 >
 > - (usuario_1, 10 BTC, 8000 USDT);
 > - (usuario_2, 8 BTC, 12000 USDT);
 > - (usuario_3, 500 ADA)
 >
+<br>
+De no recordar el user_id, puede hacer cualquiera de las dos siguienttes cosas
+
+- Hacer una peticion **GET** a http://localhost:4000/my-account/:email
+![](./images_readme/img_get_user_info.png)
+<br>
+<br>
+obtendra esta la siguente respuesta
+![](./images_readme/img_response_get_user_info.png)
+
+<br>
+
+- Hacer un SELECT a la tabla users
+```sql
+    SELECT * FROM users;
+```
+<br>
+<br>
+
+9) para esta parte crearemos nuestras primeras ordenes limite.
+ 
+ >primero se deben de hacer estas, ya que en el dessarrollo solo se contemplo para el caso de las ordenes de mercado en el cual ya existe liquidez sucifiente en los libros.
+
+ > Tambien se debe tener en cuenta que no debe ingresar ordenes que no se puedan ejecutar de forma completa, ya que no se tuvo en cuenta el uso de ordenes parciales
+
+ > si segue los ejemplos dados todo saldra bien, ya que para estos se tuvo lo anteriormente mencionado en cuenta
+
+<br>
+<br>
+
+  Hacer una peticion **POST** a http://localhost:4000/trade , de la siguiente forma
+
+ > En el programa se tiene solo dos pares de intercambio (exchange_pair), los cuales son:
+ > 
+ > - BTC/USDT
+ > - ADA/USDT
+
+ La parte _**price**_ indica el precio al que se desea vender en terminos de la segunda moneda del _**exchange_pair**_.
+ <br>
+ El _**input_amount**_ es la cantidad del _**input_coin**_ que se desea cambiar
+ <br>
+ El _**output_coin**_ es la modena que se desea recibir una vez realizado el intercambio.
+ <br>
+ El _**exchange_pair**_ nos indica las dos monedas que se pueden intercambiar
+
+ ![](./images_readme/img_create_limit_order.png)
+  
+  Al precionar **Send**(recuerede dar ctrl+s en la parte del json) obtendra la siguiente respuesta
+ 
+```js
+{
+  "message": "limit order created sucesfully"
+}
+```
+<br>
+procederemos a crear otras 3 ordernes limite con los siguientes valores:
+<br>
+{userId, input_coin, output_coin, input_amount, price, exchange_pair, order_type} 
+
+```json
+{
+    "userId": 1,
+    "input_coin": "BTC",
+    "output_coin": "USDT",
+    "input_amount": 2,
+    "price": 2000,
+    "exchange_pair": "BTC/USDT",
+    "order_type": "limit"
+}
+```
+
+
+
 
 
 

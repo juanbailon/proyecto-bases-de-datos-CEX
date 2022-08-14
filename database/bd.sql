@@ -186,3 +186,9 @@ INSERT INTO coins (ticker_symbol, coin_name)
   VALUES ('BTC', 'bitcoin'),
          ('USDT', 'tether_USD'),
          ('ADA', 'cardano_ADA');
+
+INSERT INTO order_book (order_book_id, exchange_pair, coin_1, coin_2, bid_book_id, ask_book_id ) 
+  VALUES (1, 'BTC/USDT', 'BTC', 'USDT', 1, 1 ),
+         (2, 'ADA/USDT', 'ADA', 'USDT', 2, 2 );   
+
+               
